@@ -1,0 +1,39 @@
+.Button {
+  font-family: Ubuntu, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  color: white;
+
+  border: none;
+  padding: 0;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  background: rgb(248, 0, 0);
+  font-size: 18px;
+  width: 100%;
+  border-radius: 12px;
+  height: 48px;
+
+  &__secondary {
+    background: rgba(248, 0, 0, 0.3);
+    color: rgb(248, 0, 0);
+  }
+
+  &__tertiary {
+    padding: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 0;
+    width: unset;
+    height: unset;
+  }
+}
+
+.Button:active {
+  opacity: 0.7;
+}
+
+.Button:disabled {
+  opacity: 0.5;
+}

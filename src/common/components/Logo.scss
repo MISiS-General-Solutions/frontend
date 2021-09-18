@@ -1,0 +1,30 @@
+.Logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &__icon {
+    max-height: 45px;
+    max-width: 45px;
+    min-height: 45px;
+    min-width: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+    background: rgb(248, 0, 0);
+    box-shadow: 0 2px 4px rgba(248, 0, 0, 0.3);
+  }
+
+  &__text {
+    font-family: Ubuntu, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 42px;
+    line-height: 48px;
+    color: rgb(0, 0, 0);
+    margin-left: 16px;
+  }
+}
