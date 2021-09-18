@@ -14,6 +14,9 @@ export default class Backend {
       cache: "no-cache",
       redirect: "error",
       body: JSON.stringify(params),
+      headers: {
+        'Content-Type': 'application/json'
+      }
     };
 
     return new Promise((resolve, reject) => {

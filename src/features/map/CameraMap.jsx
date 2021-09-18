@@ -1,9 +1,10 @@
 import React from "react"
-import {MapContainer, TileLayer, MapConsumer, Marker, Popup, Polyline} from "react-leaflet";
+import {MapContainer, TileLayer, MapConsumer, Marker, Polyline} from "react-leaflet";
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'
 import 'leaflet-defaulticon-compatibility'
 import "./CameraMap.scss"
+import Backend from "../../common/backend/Backend";
 import Logo from "../../common/components/Logo"
 import Button from "../../common/components/Button"
 import UserLocation from "./UserLocation"
@@ -60,9 +61,10 @@ class CameraMap extends React.Component {
     const {targets, waitingClick} = this.state
     if (waitingClick) {
       this.setState({
-        targets: [...targets, {
-          coords: [event.latlng.lat, event.latlng.lng]
-        }],
+        targets: [
+          ...targets,
+          [event.latlng.lat, event.latlng.lng]
+        ],
         route: null,
         waitingClick: false
       })
@@ -70,14 +72,18 @@ class CameraMap extends React.Component {
   }
 
   buildRoute() {
-    // TODO: Api
     const {targets} = this.state
-    if (this.state.targets.length >= 2) {
-      this.setState({
-        targets: [],
-        route: targets.map(e => e.coords)
-      })
+    if (this.state.targets.length < 2) {
+      return
     }
+
+    Backend.call("mapping/find_route", {targets})
+      .then((r) => {
+        this.setState({
+          targets: [],
+          route: r.result
+        })
+      })
   }
 
   render() {
@@ -123,7 +129,7 @@ class CameraMap extends React.Component {
         }
         {
           targets.map((current, i) => (
-            <Marker key={`marker-${i}`} position={current.coords}/>
+            <Marker key={`marker-${i}`} position={current}/>
           ))
         }
         {
