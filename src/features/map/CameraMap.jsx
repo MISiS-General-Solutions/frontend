@@ -5,6 +5,8 @@ import "./Map.scss"
 import Logo from "../../common/components/Logo";
 import Button from "../../common/components/Button";
 import UserLocation from "./UserLocation";
+import OverlayButton from "./OverlayButton";
+import GPSIcon from "../../assets/img/gps.svg"
 
 const centerCords = [55.75222, 37.6155]
 
@@ -63,6 +65,11 @@ class CameraMap extends React.Component {
             return null
           }}
         </MapConsumer>
+        <OverlayButton
+          position="bottomLeft"
+          icon={GPSIcon}
+          onClick={() => this.watchPosition()}
+        />
         {userPosition &&
           <UserLocation
             latitude={userPosition.latitude}
