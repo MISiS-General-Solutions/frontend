@@ -16,7 +16,14 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    height: 84px;
+    min-height: 84px;
     background-color: white;
+  }
+
+  &__menu {
+    display: flex;
+    padding: 15px;
+    background-color: #f4f4f4;
+    flex-direction: row;
   }
 }

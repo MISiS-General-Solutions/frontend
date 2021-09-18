@@ -1,12 +1,16 @@
-import React, {createRef} from "react"
-import {MapContainer, TileLayer, MapConsumer} from "react-leaflet";
+import React from "react"
+import {MapContainer, TileLayer, MapConsumer, Marker, Popup, Polyline} from "react-leaflet";
 import 'leaflet/dist/leaflet.css'
-import "./Map.scss"
-import Logo from "../../common/components/Logo";
-import Button from "../../common/components/Button";
-import UserLocation from "./UserLocation";
-import OverlayButton from "./OverlayButton";
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'
+import 'leaflet-defaulticon-compatibility'
+import "./CameraMap.scss"
+import Logo from "../../common/components/Logo"
+import Button from "../../common/components/Button"
+import UserLocation from "./UserLocation"
+import OverlayButton from "./OverlayButton"
 import GPSIcon from "../../assets/img/gps.svg"
+import EventHandler from "./EventHandler";
+import {IconRed} from "./Icons";
 
 const centerCords = [55.75222, 37.6155]
 
@@ -18,6 +22,10 @@ class CameraMap extends React.Component {
     this.currentMap = null
     this.state = {
       userPosition: null,
+      showMenu: false,
+      targets: [],
+      waitingClick: false,
+      route: null
     }
   }
 
@@ -48,8 +56,32 @@ class CameraMap extends React.Component {
     }
   }
 
+  handleMapClick(event) {
+    const {targets, waitingClick} = this.state
+    if (waitingClick) {
+      this.setState({
+        targets: [...targets, {
+          coords: [event.latlng.lat, event.latlng.lng]
+        }],
+        route: null,
+        waitingClick: false
+      })
+    }
+  }
+
+  buildRoute() {
+    // TODO: Api
+    const {targets} = this.state
+    if (this.state.targets.length >= 2) {
+      this.setState({
+        targets: [],
+        route: targets.map(e => e.coords)
+      })
+    }
+  }
+
   render() {
-    const {userPosition} = this.state
+    const {userPosition, showMenu, targets, route} = this.state
 
     return <div className="CameraMap">
       <MapContainer
@@ -72,6 +104,11 @@ class CameraMap extends React.Component {
             return null
           }}
         </MapConsumer>
+        <EventHandler
+          events={{
+            click: (e) => this.handleMapClick(e)
+          }}
+        />
         <OverlayButton
           position="bottomLeft"
           icon={GPSIcon}
@@ -84,14 +121,56 @@ class CameraMap extends React.Component {
             accuracy={userPosition.accuracy}
           />
         }
+        {
+          targets.map((current, i) => (
+            <Marker key={`marker-${i}`} position={current.coords}/>
+          ))
+        }
+        {
+          route &&
+            <>
+              <Polyline
+                pathOptions={{color: "red", opacity: 0.8}}
+                positions={route}
+              />
+              <Marker position={route[0]} icon={IconRed}/>
+              <Marker position={route[route.length - 1]} icon={IconRed}/>
+            </>
+        }
       </MapContainer>
+      {showMenu &&
+        <div className="CameraMap__menu">
+          <Button
+            mode="primary"
+            style={{marginRight: 15}}
+            onClick={() => this.setState({waitingClick: true})}
+          >
+            Добавить точку
+          </Button>
+          <Button
+            mode="primary"
+            style={{marginRight: 15, width: 150}}
+            onClick={() => this.setState({targets: []})}
+          >
+            Очистить
+          </Button>
+          <Button
+            mode="primary"
+            style={{marginRight: 15, width: 150}}
+            onClick={() => this.buildRoute()}
+          >
+            Построить
+          </Button>
+        </div>
+      }
       <div className="CameraMap__control">
         <Logo style={{marginLeft: 15}}/>
         <Button
           mode="primary"
           style={{marginRight: 15, width: 100}}
+          onClick={() => this.setState({showMenu: !showMenu})}
         >
-          Добавить
+          Меню
         </Button>
       </div>
     </div>
