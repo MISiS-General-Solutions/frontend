@@ -59,7 +59,7 @@ class CameraMap extends React.Component {
         style={{height: "100%", flexGrow: 1}}
       >
         <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          attribution='© <a href="https://www.mapbox.com/feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}"
           id="mapbox/dark-v10"
           accessToken="pk.eyJ1IjoiZWdlc2hhIiwiYSI6ImNrdG9oczJ1ZTBjeTgyeGw0Y2h0eW02OW8ifQ.MwY9X05BLX-4fhw5DAVUMA"
