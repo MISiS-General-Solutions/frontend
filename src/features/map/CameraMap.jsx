@@ -24,18 +24,25 @@ class CameraMap extends React.Component {
   watchPosition() {
     const options = {
       enableHighAccuracy: false,
-      timeout: 5000,
       maximumAge: 0
     }
 
     if (this.geoWatcher === null) {
       this.geoWatcher = navigator.geolocation.watchPosition(
         (pos) => {
+          if (this.state.userPosition == null) {
+            const latLng = [pos.coords.latitude, pos.coords.longitude]
+            this.currentMap.flyTo(latLng, 16)
+          }
           this.setState({userPosition: pos.coords})
-          const latLng = [pos.coords.latitude, pos.coords.longitude]
-          this.currentMap.flyTo(latLng, 16)
         },
-        (error) => console.log(error),
+        (error) => {
+          if (error.code === error.PERMISSION_DENIED) {
+            this.setState({userPosition: null})
+            navigator.geolocation.clearWatch(this.geoWatcher);
+            this.geoWatcher = null
+          }
+        },
         options
       )
     }

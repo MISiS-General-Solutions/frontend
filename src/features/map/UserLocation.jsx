@@ -19,7 +19,7 @@ const UserLocation = (props) => {
       <Circle
         center={[latitude, longitude]}
         pathOptions={{fillColor: "red", color: "white", fillOpacity: 1}}
-        radius={10}
+        radius={5}
       />
     </LayerGroup>
   )
