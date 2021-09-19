@@ -1,9 +1,11 @@
 import React from "react"
 import {MapContainer, TileLayer, MapConsumer, Marker, Polyline} from "react-leaflet";
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'
 import 'leaflet-defaulticon-compatibility'
 import "./CameraMap.scss"
+import "react-leaflet-markercluster/dist/styles.min.css"
 import Backend from "../../common/backend/Backend";
 import Logo from "../../common/components/Logo"
 import Button from "../../common/components/Button"
@@ -26,7 +28,9 @@ class CameraMap extends React.Component {
       showMenu: false,
       targets: [],
       waitingClick: false,
-      route: null
+      route: null,
+      cameras: [],
+      showCameras: false,
     }
   }
 
@@ -57,9 +61,24 @@ class CameraMap extends React.Component {
     }
   }
 
+  showCameras() {
+    if (this.state.showCameras) {
+      this.setState({showCameras: false})
+    } else {
+      Backend.call("cameras/get", {})
+        .then((r) => {
+          this.setState({
+            cameras: r,
+            showCameras: true
+          })
+        })
+    }
+  }
+
   handleMapClick(event) {
     const {targets, waitingClick} = this.state
     if (waitingClick) {
+      console.log([event.latlng.lat, event.latlng.lng])
       this.setState({
         targets: [
           ...targets,
@@ -77,17 +96,17 @@ class CameraMap extends React.Component {
       return
     }
 
-    Backend.call("mapping/find_route", {targets})
+    Backend.call("mapping/find_route", targets.map(e => ({Lat: e[0], Lon: e[1]})))
       .then((r) => {
         this.setState({
           targets: [],
-          route: r.result
+          route: r.Coords.map(c => [c.Lat, c.Lon])
         })
       })
   }
 
   render() {
-    const {userPosition, showMenu, targets, route} = this.state
+    const {userPosition, showMenu, targets, route, cameras, showCameras} = this.state
 
     return <div className="CameraMap">
       <MapContainer
@@ -104,6 +123,11 @@ class CameraMap extends React.Component {
           trackUserLocation={true}
           showUserHeading={true}
         />
+        <MarkerClusterGroup>
+          {showCameras && cameras.map(camera => (
+            <Marker key={`camera-${camera.id}`} position={camera.coords}/>
+          ))}
+        </MarkerClusterGroup>
         <MapConsumer>
           {(map) => {
             this.currentMap = map
@@ -148,24 +172,27 @@ class CameraMap extends React.Component {
         <div className="CameraMap__menu">
           <Button
             mode="primary"
-            style={{marginRight: 15}}
             onClick={() => this.setState({waitingClick: true})}
           >
             Добавить точку
           </Button>
           <Button
             mode="primary"
-            style={{marginRight: 15, width: 150}}
             onClick={() => this.setState({targets: []})}
           >
             Очистить
           </Button>
           <Button
             mode="primary"
-            style={{marginRight: 15, width: 150}}
             onClick={() => this.buildRoute()}
           >
             Построить
+          </Button>
+          <Button
+            mode="primary"
+            onClick={() => this.showCameras()}
+          >
+            Показать камеры
           </Button>
         </div>
       }
